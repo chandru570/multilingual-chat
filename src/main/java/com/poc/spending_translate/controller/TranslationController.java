@@ -31,6 +31,13 @@ public class TranslationController {
 
     private String mockAIResponse(String englishQuery) {
         // Replace with actual AI model integration
-        return "Your last transaction was $250 at Tesco.";
+        return "Statement Overview\n" +
+                "- Statement Date: 21 Aug 2025\n" +
+                "- Due Date: 15 Sep 2025\n" +
+                "- Balance from Last Statement: £35.84\n" +
+                "- Balance on Statement Date: £89.67\n" +
+                "- Minimum Payment Due: £5.00\n" +
+                "- Payments Made: £199 total (two payments: £152 and £47)\n" +
+                "- Total Transactions: 44 (covering late July to mid-August 2025)";
     }
 }
