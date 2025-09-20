@@ -10,7 +10,13 @@ import java.util.List;
 @Service
 public class SpeechRecognitionService {
 
-    public String transcribe(byte[] audioData, String encoding, int sampleRateHertz, String languageCode)
+    private final TranslationService translationService;
+
+    public SpeechRecognitionService(TranslationService translationService) {
+        this.translationService = translationService;
+    }
+
+    public TranslateServiceResponse transcribe(byte[] audioData, String encoding, int sampleRateHertz, String languageCode)
             throws IOException {
         try (SpeechClient client = SpeechClient.create()) {
             RecognitionConfig config = RecognitionConfig.newBuilder()
@@ -32,7 +38,7 @@ public class SpeechRecognitionService {
                 transcript.append(result.getAlternativesList().get(0).getTranscript());
                 transcript.append(" ");
             }
-            return transcript.toString().trim();
+            return translationService.processTranslationQuery(transcript.toString().trim(), languageCode);
         }
     }
 }

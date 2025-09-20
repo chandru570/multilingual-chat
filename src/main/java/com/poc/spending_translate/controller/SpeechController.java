@@ -1,6 +1,7 @@
 package com.poc.spending_translate.controller;
 
 import com.poc.spending_translate.service.SpeechRecognitionService;
+import com.poc.spending_translate.service.TranslateServiceResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,14 +20,14 @@ public class SpeechController {
     }
 
     @PostMapping(value = "/transcribe", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> transcribe(
+    public ResponseEntity<TranslateServiceResponse> transcribe(
             @RequestPart("file") MultipartFile file,
             @RequestParam(defaultValue = "LINEAR16") String encoding,
             @RequestParam(defaultValue = "16000") int sampleRateHertz,
             @RequestParam(defaultValue = "en-US") String languageCode
     ) throws IOException {
         byte[] audioBytes = file.getBytes();
-        String text = speechService.transcribe(audioBytes, encoding, sampleRateHertz, languageCode);
+        TranslateServiceResponse text = speechService.transcribe(audioBytes, encoding, sampleRateHertz, languageCode);
         return ResponseEntity.ok(text);
     }
 }

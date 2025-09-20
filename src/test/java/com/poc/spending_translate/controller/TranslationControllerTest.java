@@ -1,6 +1,7 @@
 package com.poc.spending_translate.controller;
 
 import com.poc.spending_translate.service.TranslationService;
+import com.poc.spending_translate.service.TranslateServiceResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,26 +29,25 @@ class TranslationControllerTest {
         // Given
         String userInput = "Hola mundo";
         String userLang = "es";
-        String translatedToEnglish = "Hello world";
-        String expectedResponse = "Statement Overview\n" +
-                "- Statement Date: 21 Aug 2025\n" +
-                "- Due Date: 15 Sep 2025\n" +
-                "- Balance from Last Statement: £35.84\n" +
-                "- Balance on Statement Date: £89.67\n" +
-                "- Minimum Payment Due: £5.00\n" +
-                "- Payments Made: £199 total (two payments: £152 and £47)\n" +
-                "- Total Transactions: 44 (covering late July to mid-August 2025)";
+    TranslateServiceResponse mockResponse = new TranslateServiceResponse(
+        userLang,
+        userInput,
+        "es",
+        "Hello world",
+        "Statement Overview\n- Statement Date: 21 Aug 2025\n- Due Date: 15 Sep 2025\n- Balance from Last Statement: £35.84\n- Balance on Statement Date: £89.67\n- Minimum Payment Due: £5.00\n- Payments Made: £199 total (two payments: £152 and £47)\n- Total Transactions: 44 (covering late July to mid-August 2025)",
+        "Statement Overview\n- Statement Date: 21 Aug 2025\n- Due Date: 15 Sep 2025\n- Balance from Last Statement: £35.84\n- Balance on Statement Date: £89.67\n- Minimum Payment Due: £5.00\n- Payments Made: £199 total (two payments: £152 and £47)\n- Total Transactions: 44 (covering late July to mid-August 2025)"
+    );
+    when(translationService.processTranslationQuery(userInput, userLang)).thenReturn(mockResponse);
 
-        when(translationService.translateToEnglish(userInput, userLang)).thenReturn(translatedToEnglish);
-        when(translationService.translateFromEnglish(anyString(), eq(userLang))).thenReturn(expectedResponse);
+    // When
+    TranslateServiceResponse response = translationController.handleQuery(userInput, userLang);
 
-        // When
-        String result = translationController.handleQuery(userInput, userLang);
-
-        // Then
-        assertEquals(expectedResponse, result);
-        verify(translationService).translateToEnglish(userInput, userLang);
-        verify(translationService).translateFromEnglish(anyString(), eq(userLang));
+    // Then
+    assertEquals(mockResponse.getUserInputLanguage(), response.getUserInputLanguage());
+    assertEquals(mockResponse.getUserInputTextNative(), response.getUserInputTextNative());
+    assertEquals(mockResponse.getModelTranslateToEnglish(), response.getModelTranslateToEnglish());
+    assertEquals(mockResponse.getResponseDataInEnglish(), response.getResponseDataInEnglish());
+    assertEquals(mockResponse.getModelTranslateResponseToNative(), response.getModelTranslateResponseToNative());
     }
 
     @Test
@@ -56,26 +55,25 @@ class TranslationControllerTest {
         // Given
         String userInput = "";
         String userLang = "es";
-        String translatedToEnglish = "";
-        String expectedResponse = "Statement Overview\n" +
-                "- Statement Date: 21 Aug 2025\n" +
-                "- Due Date: 15 Sep 2025\n" +
-                "- Balance from Last Statement: £35.84\n" +
-                "- Balance on Statement Date: £89.67\n" +
-                "- Minimum Payment Due: £5.00\n" +
-                "- Payments Made: £199 total (two payments: £152 and £47)\n" +
-                "- Total Transactions: 44 (covering late July to mid-August 2025)";
+    TranslateServiceResponse mockResponse = new TranslateServiceResponse(
+        userLang,
+        userInput,
+        "es",
+        "",
+        "Statement Overview\n- Statement Date: 21 Aug 2025\n- Due Date: 15 Sep 2025\n- Balance from Last Statement: £35.84\n- Balance on Statement Date: £89.67\n- Minimum Payment Due: £5.00\n- Payments Made: £199 total (two payments: £152 and £47)\n- Total Transactions: 44 (covering late July to mid-August 2025)",
+        "Statement Overview\n- Statement Date: 21 Aug 2025\n- Due Date: 15 Sep 2025\n- Balance from Last Statement: £35.84\n- Balance on Statement Date: £89.67\n- Minimum Payment Due: £5.00\n- Payments Made: £199 total (two payments: £152 and £47)\n- Total Transactions: 44 (covering late July to mid-August 2025)"
+    );
+    when(translationService.processTranslationQuery(userInput, userLang)).thenReturn(mockResponse);
 
-        when(translationService.translateToEnglish(userInput, userLang)).thenReturn(translatedToEnglish);
-        when(translationService.translateFromEnglish(anyString(), eq(userLang))).thenReturn(expectedResponse);
+    // When
+    TranslateServiceResponse response = translationController.handleQuery(userInput, userLang);
 
-        // When
-        String result = translationController.handleQuery(userInput, userLang);
-
-        // Then
-        assertEquals(expectedResponse, result);
-        verify(translationService).translateToEnglish(userInput, userLang);
-        verify(translationService).translateFromEnglish(anyString(), eq(userLang));
+    // Then
+    assertEquals(mockResponse.getUserInputLanguage(), response.getUserInputLanguage());
+    assertEquals(mockResponse.getUserInputTextNative(), response.getUserInputTextNative());
+    assertEquals(mockResponse.getModelTranslateToEnglish(), response.getModelTranslateToEnglish());
+    assertEquals(mockResponse.getResponseDataInEnglish(), response.getResponseDataInEnglish());
+    assertEquals(mockResponse.getModelTranslateResponseToNative(), response.getModelTranslateResponseToNative());
     }
 
     @Test
@@ -86,13 +84,13 @@ class TranslationControllerTest {
 
         // When the service is called with null input, it should handle it gracefully
         // or throw an exception depending on implementation
-        when(translationService.translateToEnglish(userInput, userLang))
-                .thenThrow(new IllegalArgumentException("Input cannot be null"));
+    when(translationService.processTranslationQuery(userInput, userLang))
+        .thenThrow(new IllegalArgumentException("Input cannot be null"));
 
-        // When & Then
-        assertThrows(IllegalArgumentException.class, () -> {
-            translationController.handleQuery(userInput, userLang);
-        });
+    // When & Then
+    assertThrows(IllegalArgumentException.class, () -> {
+        translationController.handleQuery(userInput, userLang);
+    });
     }
 
     @Test
@@ -103,13 +101,13 @@ class TranslationControllerTest {
 
         // When the service is called with null language, it should handle it gracefully
         // or throw an exception depending on implementation
-        when(translationService.translateToEnglish(userInput, userLang))
-                .thenThrow(new IllegalArgumentException("Language cannot be null"));
+    when(translationService.processTranslationQuery(userInput, userLang))
+        .thenThrow(new IllegalArgumentException("Language cannot be null"));
 
-        // When & Then
-        assertThrows(IllegalArgumentException.class, () -> {
-            translationController.handleQuery(userInput, userLang);
-        });
+    // When & Then
+    assertThrows(IllegalArgumentException.class, () -> {
+        translationController.handleQuery(userInput, userLang);
+    });
     }
 
     @Test
@@ -117,26 +115,25 @@ class TranslationControllerTest {
         // Given
         String userInput = "Bonjour le monde";
         String userLang = "fr";
-        String translatedToEnglish = "Hello world";
-        String expectedResponse = "Statement Overview\n" +
-                "- Statement Date: 21 Aug 2025\n" +
-                "- Due Date: 15 Sep 2025\n" +
-                "- Balance from Last Statement: £35.84\n" +
-                "- Balance on Statement Date: £89.67\n" +
-                "- Minimum Payment Due: £5.00\n" +
-                "- Payments Made: £199 total (two payments: £152 and £47)\n" +
-                "- Total Transactions: 44 (covering late July to mid-August 2025)";
+    TranslateServiceResponse mockResponse = new TranslateServiceResponse(
+        userLang,
+        userInput,
+        "fr",
+        "Hello world",
+        "Statement Overview\n- Statement Date: 21 Aug 2025\n- Due Date: 15 Sep 2025\n- Balance from Last Statement: £35.84\n- Balance on Statement Date: £89.67\n- Minimum Payment Due: £5.00\n- Payments Made: £199 total (two payments: £152 and £47)\n- Total Transactions: 44 (covering late July to mid-August 2025)",
+        "Statement Overview\n- Statement Date: 21 Aug 2025\n- Due Date: 15 Sep 2025\n- Balance from Last Statement: £35.84\n- Balance on Statement Date: £89.67\n- Minimum Payment Due: £5.00\n- Payments Made: £199 total (two payments: £152 and £47)\n- Total Transactions: 44 (covering late July to mid-August 2025)"
+    );
+    when(translationService.processTranslationQuery(userInput, userLang)).thenReturn(mockResponse);
 
-        when(translationService.translateToEnglish(userInput, userLang)).thenReturn(translatedToEnglish);
-        when(translationService.translateFromEnglish(anyString(), eq(userLang))).thenReturn(expectedResponse);
+    // When
+    TranslateServiceResponse response = translationController.handleQuery(userInput, userLang);
 
-        // When
-        String result = translationController.handleQuery(userInput, userLang);
-
-        // Then
-        assertEquals(expectedResponse, result);
-        verify(translationService).translateToEnglish(userInput, userLang);
-        verify(translationService).translateFromEnglish(anyString(), eq(userLang));
+    // Then
+    assertEquals(mockResponse.getUserInputLanguage(), response.getUserInputLanguage());
+    assertEquals(mockResponse.getUserInputTextNative(), response.getUserInputTextNative());
+    assertEquals(mockResponse.getModelTranslateToEnglish(), response.getModelTranslateToEnglish());
+    assertEquals(mockResponse.getResponseDataInEnglish(), response.getResponseDataInEnglish());
+    assertEquals(mockResponse.getModelTranslateResponseToNative(), response.getModelTranslateResponseToNative());
     }
 
     @Test
@@ -145,16 +142,13 @@ class TranslationControllerTest {
         String userInput = "Hola mundo";
         String userLang = "es";
 
-        when(translationService.translateToEnglish(userInput, userLang))
-                .thenThrow(new RuntimeException("Translation service error"));
+    when(translationService.processTranslationQuery(userInput, userLang))
+        .thenThrow(new RuntimeException("Translation service error"));
 
-        // When & Then
-        assertThrows(RuntimeException.class, () -> {
-            translationController.handleQuery(userInput, userLang);
-        });
-
-        verify(translationService).translateToEnglish(userInput, userLang);
-        verify(translationService, never()).translateFromEnglish(anyString(), anyString());
+    // When & Then
+    assertThrows(RuntimeException.class, () -> {
+        translationController.handleQuery(userInput, userLang);
+    });
     }
 
     @Test
@@ -162,31 +156,32 @@ class TranslationControllerTest {
         // Given
         String userInput = "Test input";
         String userLang = "en";
-        String translatedToEnglish = "Test input";
-        String expectedResponse = "Statement Overview\n" +
-                "- Statement Date: 21 Aug 2025\n" +
-                "- Due Date: 15 Sep 2025\n" +
-                "- Balance from Last Statement: £35.84\n" +
-                "- Balance on Statement Date: £89.67\n" +
-                "- Minimum Payment Due: £5.00\n" +
-                "- Payments Made: £199 total (two payments: £152 and £47)\n" +
-                "- Total Transactions: 44 (covering late July to mid-August 2025)";
+    TranslateServiceResponse mockResponse = new TranslateServiceResponse(
+        userLang,
+        userInput,
+        "en",
+        "Test input",
+        "Statement Overview\n- Statement Date: 21 Aug 2025\n- Due Date: 15 Sep 2025\n- Balance from Last Statement: £35.84\n- Balance on Statement Date: £89.67\n- Minimum Payment Due: £5.00\n- Payments Made: £199 total (two payments: £152 and £47)\n- Total Transactions: 44 (covering late July to mid-August 2025)",
+        "Statement Overview\n- Statement Date: 21 Aug 2025\n- Due Date: 15 Sep 2025\n- Balance from Last Statement: £35.84\n- Balance on Statement Date: £89.67\n- Minimum Payment Due: £5.00\n- Payments Made: £199 total (two payments: £152 and £47)\n- Total Transactions: 44 (covering late July to mid-August 2025)"
+    );
+    when(translationService.processTranslationQuery(userInput, userLang)).thenReturn(mockResponse);
 
-        when(translationService.translateToEnglish(userInput, userLang)).thenReturn(translatedToEnglish);
-        when(translationService.translateFromEnglish(anyString(), eq(userLang))).thenReturn(expectedResponse);
+    // When
+    TranslateServiceResponse response = translationController.handleQuery(userInput, userLang);
 
-        // When
-        String result = translationController.handleQuery(userInput, userLang);
-
-        // Then
-        assertEquals(expectedResponse, result);
-        assertTrue(result.contains("Statement Overview"));
-        assertTrue(result.contains("Statement Date"));
-        assertTrue(result.contains("Due Date"));
-        assertTrue(result.contains("Balance from Last Statement"));
-        assertTrue(result.contains("Balance on Statement Date"));
-        assertTrue(result.contains("Minimum Payment Due"));
-        assertTrue(result.contains("Payments Made"));
-        assertTrue(result.contains("Total Transactions"));
+    // Then
+    assertEquals(mockResponse.getUserInputLanguage(), response.getUserInputLanguage());
+    assertEquals(mockResponse.getUserInputTextNative(), response.getUserInputTextNative());
+    assertEquals(mockResponse.getModelTranslateToEnglish(), response.getModelTranslateToEnglish());
+    assertEquals(mockResponse.getResponseDataInEnglish(), response.getResponseDataInEnglish());
+    assertEquals(mockResponse.getModelTranslateResponseToNative(), response.getModelTranslateResponseToNative());
+    assertTrue(response.getResponseDataInEnglish().contains("Statement Overview"));
+    assertTrue(response.getResponseDataInEnglish().contains("Statement Date"));
+    assertTrue(response.getResponseDataInEnglish().contains("Due Date"));
+    assertTrue(response.getResponseDataInEnglish().contains("Balance from Last Statement"));
+    assertTrue(response.getResponseDataInEnglish().contains("Balance on Statement Date"));
+    assertTrue(response.getResponseDataInEnglish().contains("Minimum Payment Due"));
+    assertTrue(response.getResponseDataInEnglish().contains("Payments Made"));
+    assertTrue(response.getResponseDataInEnglish().contains("Total Transactions"));
     }
 }

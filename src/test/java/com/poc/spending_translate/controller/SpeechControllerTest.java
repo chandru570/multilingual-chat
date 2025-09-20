@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import com.poc.spending_translate.service.TranslateServiceResponse;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
@@ -38,17 +39,18 @@ class SpeechControllerTest {
         String encoding = "LINEAR16";
         int sampleRateHertz = 16000;
         String languageCode = "en-US";
-        String expectedTranscript = "Hello world";
-
+        TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+            languageCode, "Hello world", languageCode, "Hello world", "Hello world", "Hello world"
+        );
         when(speechService.transcribe(any(byte[].class), eq(encoding), eq(sampleRateHertz), eq(languageCode)))
-                .thenReturn(expectedTranscript);
+                .thenReturn(expectedResponse);
 
         // When
-        ResponseEntity<String> response = speechController.transcribe(file, encoding, sampleRateHertz, languageCode);
+        ResponseEntity<TranslateServiceResponse> response = speechController.transcribe(file, encoding, sampleRateHertz, languageCode);
 
         // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedTranscript, response.getBody());
+        assertEquals(expectedResponse, response.getBody());
         verify(speechService).transcribe(any(byte[].class), eq(encoding), eq(sampleRateHertz), eq(languageCode));
     }
 
@@ -58,17 +60,18 @@ class SpeechControllerTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "test.wav", "audio/wav", "test audio data".getBytes()
         );
-        String expectedTranscript = "Hello world";
-
+        TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+            "en-US", "Hello world", "en-US", "Hello world", "Hello world", "Hello world"
+        );
         when(speechService.transcribe(any(byte[].class), eq("LINEAR16"), eq(16000), eq("en-US")))
-                .thenReturn(expectedTranscript);
+                .thenReturn(expectedResponse);
 
         // When
-        ResponseEntity<String> response = speechController.transcribe(file, "LINEAR16", 16000, "en-US");
+        ResponseEntity<TranslateServiceResponse> response = speechController.transcribe(file, "LINEAR16", 16000, "en-US");
 
         // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedTranscript, response.getBody());
+        assertEquals(expectedResponse, response.getBody());
         verify(speechService).transcribe(any(byte[].class), eq("LINEAR16"), eq(16000), eq("en-US"));
     }
 
@@ -81,17 +84,18 @@ class SpeechControllerTest {
         String encoding = "MP3";
         int sampleRateHertz = 44100;
         String languageCode = "es-ES";
-        String expectedTranscript = "Hola mundo";
-
+        TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+            languageCode, "Hola mundo", languageCode, "Hola mundo", "Hola mundo", "Hola mundo"
+        );
         when(speechService.transcribe(any(byte[].class), eq(encoding), eq(sampleRateHertz), eq(languageCode)))
-                .thenReturn(expectedTranscript);
+                .thenReturn(expectedResponse);
 
         // When
-        ResponseEntity<String> response = speechController.transcribe(file, encoding, sampleRateHertz, languageCode);
+        ResponseEntity<TranslateServiceResponse> response = speechController.transcribe(file, encoding, sampleRateHertz, languageCode);
 
         // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedTranscript, response.getBody());
+        assertEquals(expectedResponse, response.getBody());
         verify(speechService).transcribe(any(byte[].class), eq(encoding), eq(sampleRateHertz), eq(languageCode));
     }
 
@@ -104,17 +108,18 @@ class SpeechControllerTest {
         String encoding = "LINEAR16";
         int sampleRateHertz = 16000;
         String languageCode = "en-US";
-        String expectedTranscript = "";
-
+        TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+            languageCode, "", languageCode, "", "", ""
+        );
         when(speechService.transcribe(any(byte[].class), eq(encoding), eq(sampleRateHertz), eq(languageCode)))
-                .thenReturn(expectedTranscript);
+                .thenReturn(expectedResponse);
 
         // When
-        ResponseEntity<String> response = speechController.transcribe(file, encoding, sampleRateHertz, languageCode);
+        ResponseEntity<TranslateServiceResponse> response = speechController.transcribe(file, encoding, sampleRateHertz, languageCode);
 
         // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedTranscript, response.getBody());
+        assertEquals(expectedResponse, response.getBody());
         verify(speechService).transcribe(any(byte[].class), eq(encoding), eq(sampleRateHertz), eq(languageCode));
     }
 
@@ -163,18 +168,19 @@ class SpeechControllerTest {
         String encoding = "LINEAR16";
         int sampleRateHertz = 16000;
         String languageCode = "en-US";
-        String expectedTranscript = "Hello world";
+    TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+        languageCode, "Hello world", languageCode, "Hello world", "Hello world", "Hello world"
+    );
+    when(speechService.transcribe(eq(expectedBytes), eq(encoding), eq(sampleRateHertz), eq(languageCode)))
+        .thenReturn(expectedResponse);
 
-        when(speechService.transcribe(eq(expectedBytes), eq(encoding), eq(sampleRateHertz), eq(languageCode)))
-                .thenReturn(expectedTranscript);
+    // When
+    ResponseEntity<TranslateServiceResponse> response = speechController.transcribe(file, encoding, sampleRateHertz, languageCode);
 
-        // When
-        ResponseEntity<String> response = speechController.transcribe(file, encoding, sampleRateHertz, languageCode);
-
-        // Then
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedTranscript, response.getBody());
-        verify(speechService).transcribe(eq(expectedBytes), eq(encoding), eq(sampleRateHertz), eq(languageCode));
+    // Then
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(expectedResponse, response.getBody());
+    verify(speechService).transcribe(eq(expectedBytes), eq(encoding), eq(sampleRateHertz), eq(languageCode));
     }
 
     @Test
@@ -187,17 +193,19 @@ class SpeechControllerTest {
         String encoding = "LINEAR16";
         int sampleRateHertz = 16000;
         String languageCode = "en-US";
-        String expectedTranscript = "Large audio file transcription";
+    TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+        languageCode, "Large audio file transcription", languageCode, "Large audio file transcription", "Large audio file transcription", "Large audio file transcription"
+    );
+    when(speechService.transcribe(eq(largeAudioData), eq(encoding), eq(sampleRateHertz), eq(languageCode)))
+        .thenReturn(expectedResponse);
 
-        when(speechService.transcribe(eq(largeAudioData), eq(encoding), eq(sampleRateHertz), eq(languageCode)))
-                .thenReturn(expectedTranscript);
+    // When
+    ResponseEntity<TranslateServiceResponse> response = speechController.transcribe(file, encoding, sampleRateHertz, languageCode);
 
-        // When
-        ResponseEntity<String> response = speechController.transcribe(file, encoding, sampleRateHertz, languageCode);
-
-        // Then
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedTranscript, response.getBody());
+    // Then
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(expectedResponse, response.getBody());
+    assertEquals(expectedResponse, response.getBody());
         verify(speechService).transcribe(eq(largeAudioData), eq(encoding), eq(sampleRateHertz), eq(languageCode));
     }
 }

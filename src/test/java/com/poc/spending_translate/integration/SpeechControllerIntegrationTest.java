@@ -2,6 +2,7 @@ package com.poc.spending_translate.integration;
 
 import com.poc.spending_translate.config.TestConfig;
 import com.poc.spending_translate.service.SpeechRecognitionService;
+import com.poc.spending_translate.service.TranslateServiceResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -38,10 +39,11 @@ class SpeechControllerIntegrationTest {
         String encoding = "LINEAR16";
         int sampleRateHertz = 16000;
         String languageCode = "en-US";
-        String expectedTranscript = "Hello world";
-
+        TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+            languageCode, "Hello world", languageCode, "Hello world", "Hello world", "Hello world"
+        );
         when(speechRecognitionService.transcribe(any(byte[].class), eq(encoding), eq(sampleRateHertz), eq(languageCode)))
-                .thenReturn(expectedTranscript);
+                .thenReturn(expectedResponse);
 
         // When & Then
         mockMvc.perform(multipart("/api/speech/transcribe")
@@ -50,7 +52,7 @@ class SpeechControllerIntegrationTest {
                         .param("sampleRateHertz", String.valueOf(sampleRateHertz))
                         .param("languageCode", languageCode))
                 .andExpect(status().isOk())
-                .andExpect(content().string(expectedTranscript));
+                .andExpect(jsonPath("$.userInputTextNative").value("Hello world"));
     }
 
     @Test
@@ -59,16 +61,17 @@ class SpeechControllerIntegrationTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "test.wav", "audio/wav", "test audio data".getBytes()
         );
-        String expectedTranscript = "Hello world";
-
+        TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+            "en-US", "Hello world", "en-US", "Hello world", "Hello world", "Hello world"
+        );
         when(speechRecognitionService.transcribe(any(byte[].class), eq("LINEAR16"), eq(16000), eq("en-US")))
-                .thenReturn(expectedTranscript);
+                .thenReturn(expectedResponse);
 
         // When & Then
         mockMvc.perform(multipart("/api/speech/transcribe")
                         .file(file))
                 .andExpect(status().isOk())
-                .andExpect(content().string(expectedTranscript));
+                .andExpect(jsonPath("$.userInputTextNative").value("Hello world"));
     }
 
     @Test
@@ -80,10 +83,11 @@ class SpeechControllerIntegrationTest {
         String encoding = "LINEAR16";
         int sampleRateHertz = 16000;
         String languageCode = "es-ES";
-        String expectedTranscript = "Hola mundo";
-
+        TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+            languageCode, "Hola mundo", languageCode, "Hola mundo", "Hola mundo", "Hola mundo"
+        );
         when(speechRecognitionService.transcribe(any(byte[].class), eq(encoding), eq(sampleRateHertz), eq(languageCode)))
-                .thenReturn(expectedTranscript);
+                .thenReturn(expectedResponse);
 
         // When & Then
         mockMvc.perform(multipart("/api/speech/transcribe")
@@ -92,7 +96,7 @@ class SpeechControllerIntegrationTest {
                         .param("sampleRateHertz", String.valueOf(sampleRateHertz))
                         .param("languageCode", languageCode))
                 .andExpect(status().isOk())
-                .andExpect(content().string(expectedTranscript));
+                .andExpect(jsonPath("$.userInputTextNative").value("Hola mundo"));
     }
 
     @Test
@@ -104,10 +108,11 @@ class SpeechControllerIntegrationTest {
         String encoding = "MP3";
         int sampleRateHertz = 44100;
         String languageCode = "en-US";
-        String expectedTranscript = "Hello world";
-
+        TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+            languageCode, "Hello world", languageCode, "Hello world", "Hello world", "Hello world"
+        );
         when(speechRecognitionService.transcribe(any(byte[].class), eq(encoding), eq(sampleRateHertz), eq(languageCode)))
-                .thenReturn(expectedTranscript);
+                .thenReturn(expectedResponse);
 
         // When & Then
         mockMvc.perform(multipart("/api/speech/transcribe")
@@ -116,7 +121,7 @@ class SpeechControllerIntegrationTest {
                         .param("sampleRateHertz", String.valueOf(sampleRateHertz))
                         .param("languageCode", languageCode))
                 .andExpect(status().isOk())
-                .andExpect(content().string(expectedTranscript));
+                .andExpect(jsonPath("$.userInputTextNative").value("Hello world"));
     }
 
     @Test
@@ -128,10 +133,11 @@ class SpeechControllerIntegrationTest {
         String encoding = "LINEAR16";
         int sampleRateHertz = 16000;
         String languageCode = "en-US";
-        String expectedTranscript = "";
-
+        TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+            languageCode, "", languageCode, "", "", ""
+        );
         when(speechRecognitionService.transcribe(any(byte[].class), eq(encoding), eq(sampleRateHertz), eq(languageCode)))
-                .thenReturn(expectedTranscript);
+                .thenReturn(expectedResponse);
 
         // When & Then
         mockMvc.perform(multipart("/api/speech/transcribe")
@@ -140,7 +146,7 @@ class SpeechControllerIntegrationTest {
                         .param("sampleRateHertz", String.valueOf(sampleRateHertz))
                         .param("languageCode", languageCode))
                 .andExpect(status().isOk())
-                .andExpect(content().string(expectedTranscript));
+                .andExpect(jsonPath("$.userInputTextNative").value(""));
     }
 
     @Test
@@ -153,10 +159,11 @@ class SpeechControllerIntegrationTest {
         String encoding = "LINEAR16";
         int sampleRateHertz = 16000;
         String languageCode = "en-US";
-        String expectedTranscript = "Large audio file transcription";
-
+        TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+            languageCode, "Large audio file transcription", languageCode, "Large audio file transcription", "Large audio file transcription", "Large audio file transcription"
+        );
         when(speechRecognitionService.transcribe(any(byte[].class), eq(encoding), eq(sampleRateHertz), eq(languageCode)))
-                .thenReturn(expectedTranscript);
+                .thenReturn(expectedResponse);
 
         // When & Then
         mockMvc.perform(multipart("/api/speech/transcribe")
@@ -165,7 +172,7 @@ class SpeechControllerIntegrationTest {
                         .param("sampleRateHertz", String.valueOf(sampleRateHertz))
                         .param("languageCode", languageCode))
                 .andExpect(status().isOk())
-                .andExpect(content().string(expectedTranscript));
+                .andExpect(jsonPath("$.userInputTextNative").value("Large audio file transcription"));
     }
 
     @Test
@@ -235,9 +242,11 @@ class SpeechControllerIntegrationTest {
         String[] languages = {"en-US", "es-ES", "fr-FR", "de-DE"};
 
         for (String languageCode : languages) {
-            String expectedTranscript = "Transcription in " + languageCode;
+            TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+                languageCode, "Transcription in " + languageCode, languageCode, "Transcription in " + languageCode, "Transcription in " + languageCode, "Transcription in " + languageCode
+            );
             when(speechRecognitionService.transcribe(any(byte[].class), eq(encoding), eq(sampleRateHertz), eq(languageCode)))
-                    .thenReturn(expectedTranscript);
+                    .thenReturn(expectedResponse);
 
             // When & Then
             mockMvc.perform(multipart("/api/speech/transcribe")
@@ -246,7 +255,7 @@ class SpeechControllerIntegrationTest {
                             .param("sampleRateHertz", String.valueOf(sampleRateHertz))
                             .param("languageCode", languageCode))
                     .andExpect(status().isOk())
-                    .andExpect(content().string(expectedTranscript));
+                    .andExpect(jsonPath("$.userInputTextNative").value("Transcription in " + languageCode));
         }
     }
 }

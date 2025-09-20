@@ -30,11 +30,14 @@ class SpeechRecognitionServiceTest {
     @Mock
     private SpeechRecognitionAlternative alternative;
 
+    @Mock
+    private TranslationService translationService;
+
     private SpeechRecognitionService speechService;
 
     @BeforeEach
     void setUp() {
-        speechService = new SpeechRecognitionService();
+    speechService = new SpeechRecognitionService(translationService);
     }
 
     @Test
@@ -45,22 +48,27 @@ class SpeechRecognitionServiceTest {
         int sampleRateHertz = 16000;
         String languageCode = "en-US";
         String expectedTranscript = "Hello world";
+        TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+            "en-US", expectedTranscript, "en-US", expectedTranscript, expectedTranscript, expectedTranscript
+        );
 
         try (MockedStatic<SpeechClient> mockedSpeechClient = mockStatic(SpeechClient.class)) {
             mockedSpeechClient.when(SpeechClient::create).thenReturn(speechClient);
             
-            when(speechClient.recognize(any(RecognitionConfig.class), any(RecognitionAudio.class)))
-                    .thenReturn(recognizeResponse);
-            when(recognizeResponse.getResultsList()).thenReturn(Arrays.asList(recognitionResult));
-            when(recognitionResult.getAlternativesList()).thenReturn(Arrays.asList(alternative));
-            when(alternative.getTranscript()).thenReturn(expectedTranscript);
+        when(speechClient.recognize(any(RecognitionConfig.class), any(RecognitionAudio.class)))
+            .thenReturn(recognizeResponse);
+        when(recognizeResponse.getResultsList()).thenReturn(Arrays.asList(recognitionResult));
+        when(recognitionResult.getAlternativesList()).thenReturn(Arrays.asList(alternative));
+        when(alternative.getTranscript()).thenReturn(expectedTranscript);
+        when(translationService.processTranslationQuery(anyString(), eq(languageCode))).thenReturn(expectedResponse);
 
-            // When
-            String result = speechService.transcribe(audioData, encoding, sampleRateHertz, languageCode);
+        // When
+        TranslateServiceResponse result = speechService.transcribe(audioData, encoding, sampleRateHertz, languageCode);
 
-            // Then
-            assertEquals(expectedTranscript, result);
-            verify(speechClient).recognize(any(RecognitionConfig.class), any(RecognitionAudio.class));
+        // Then
+        assertEquals(expectedResponse, result);
+        verify(speechClient).recognize(any(RecognitionConfig.class), any(RecognitionAudio.class));
+        verify(translationService).processTranslationQuery(anyString(), eq(languageCode));
         }
     }
 
@@ -72,6 +80,9 @@ class SpeechRecognitionServiceTest {
         int sampleRateHertz = 16000;
         String languageCode = "en-US";
         String expectedTranscript = "Hello world How are you";
+        TranslateServiceResponse expectedResponse = new TranslateServiceResponse(
+            languageCode, expectedTranscript, languageCode, expectedTranscript, expectedTranscript, expectedTranscript
+        );
 
         SpeechRecognitionResult result1 = mock(SpeechRecognitionResult.class);
         SpeechRecognitionResult result2 = mock(SpeechRecognitionResult.class);
@@ -90,11 +101,12 @@ class SpeechRecognitionServiceTest {
                     .thenReturn(recognizeResponse);
             when(recognizeResponse.getResultsList()).thenReturn(Arrays.asList(result1, result2));
 
+            when(translationService.processTranslationQuery(anyString(), eq(languageCode))).thenReturn(expectedResponse);
             // When
-            String result = speechService.transcribe(audioData, encoding, sampleRateHertz, languageCode);
+            TranslateServiceResponse result = speechService.transcribe(audioData, encoding, sampleRateHertz, languageCode);
 
             // Then
-            assertEquals(expectedTranscript, result);
+            assertEquals(expectedResponse, result);
         }
     }
 
@@ -113,11 +125,14 @@ class SpeechRecognitionServiceTest {
                     .thenReturn(recognizeResponse);
             when(recognizeResponse.getResultsList()).thenReturn(Arrays.asList());
 
+            when(translationService.processTranslationQuery(anyString(), eq(languageCode))).thenReturn(
+                new TranslateServiceResponse(languageCode, "", languageCode, "", "", "")
+            );
             // When
-            String result = speechService.transcribe(audioData, encoding, sampleRateHertz, languageCode);
+            TranslateServiceResponse result = speechService.transcribe(audioData, encoding, sampleRateHertz, languageCode);
 
             // Then
-            assertEquals("", result);
+            assertEquals("", result.getUserInputTextNative());
         }
     }
 
@@ -168,11 +183,14 @@ class SpeechRecognitionServiceTest {
                     .thenReturn(recognizeResponse);
             when(recognizeResponse.getResultsList()).thenReturn(Arrays.asList());
 
+            when(translationService.processTranslationQuery(anyString(), eq(languageCode))).thenReturn(
+                new TranslateServiceResponse(languageCode, "", languageCode, "", "", "")
+            );
             // When
-            String result = speechService.transcribe(audioData, encoding, sampleRateHertz, languageCode);
+            TranslateServiceResponse result = speechService.transcribe(audioData, encoding, sampleRateHertz, languageCode);
 
             // Then
-            assertEquals("", result);
+            assertEquals("", result.getUserInputTextNative());
         }
     }
 }
