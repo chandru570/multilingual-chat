@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multilingual Chat</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f6f6f6; }
+        header { background: #fff; padding: 10px 20px; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .logo { height: 40px; }
+        .container { max-width: 500px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        label { font-weight: bold; }
+        input[type="text"] { width: 100%; padding: 10px; margin: 10px 0 20px 0; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #00703c; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #005a2b; }
+        #response { margin-top: 30px; padding: 15px; background: #e9f5ee; border-radius: 6px; min-height: 40px; }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="../static/logo.png" alt="Lloyds Logo" class="logo">
+    </header>
+    <div class="container">
+        <h2>Multilingual Chat</h2>
+        <form id="chatForm">
+            <label for="askAI">Ask AI</label>
+            <input type="text" id="askAI" name="askAI" required>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="response"></div>
+    </div>
+    <script>
+        document.getElementById('chatForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const userInput = document.getElementById('askAI').value;
+            const responseDiv = document.getElementById('response');
+            responseDiv.textContent = 'Loading...';
+            try {
+                const res = await fetch(`http://localhost:8080/api/translate/query?userInput=${encodeURIComponent(userInput)}`);
+                const json = await res.json();
+                // Render modelTranslateResponseToNative and responseDataInEnglish fields
+                let nativeText = json.modelTranslateResponseToNative || 'No response.';
+                let englishText = json.responseDataInEnglish ? `<div style=\"margin-top:10px;color:#555;font-size:14px;\"><strong>English:</strong> ${json.responseDataInEnglish}</div>` : '';
+                responseDiv.innerHTML = nativeText + englishText;
+            } catch (err) {
+                responseDiv.textContent = 'Error: ' + err;
+            }
+        });
+    </script>
+</body>
+</html>

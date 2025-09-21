@@ -19,12 +19,14 @@ public class TranslationService {
         // Step 1: Detect language
         Detection detection = translate.detect(userInput);
         String detectedLang = detection.getLanguage();
+        System.out.println("Language: " + detectedLang);
+        System.out.println("Confidence: " + detection.getConfidence());
 
         // Step 2: Translate user input to English
         String translatedToEnglish = translateToEnglish(userInput, detectedLang);
 
-        // Step 3: Send translated input to AI model (mocked here)
-        String aiResponse = mockAIResponse(translatedToEnglish);
+    // Step 3: Send translated input to AI model (Gemini)
+    String aiResponse = com.poc.spending_translate.utility.GenerateTextFromTextInput.generateSummary(translatedToEnglish);
 
         // Step 4: Translate AI response back to user's language
         String translatedResponseToNative = translateFromEnglish(aiResponse, detectedLang);
@@ -41,10 +43,9 @@ public class TranslationService {
     }
 
     String translateToEnglish(String inputText, String sourceLang) {
-        Detection detection = translate.detect(inputText);
-        System.out.println("Language: " + detection.getLanguage());
-        System.out.println("Confidence: " + detection.getConfidence());
-
+        if(sourceLang.equals("en")) {
+            return inputText; // No translation needed
+        }
         Translation translation = translate.translate(
                 inputText,
                 Translate.TranslateOption.sourceLanguage(sourceLang),
@@ -54,6 +55,9 @@ public class TranslationService {
     }
 
     String translateFromEnglish(String inputText, String targetLang) {
+        if(targetLang.equals("en")) {
+            return inputText; // No translation needed
+        }
         Translation translation = translate.translate(
                 inputText,
                 Translate.TranslateOption.sourceLanguage("en"),
@@ -63,14 +67,7 @@ public class TranslationService {
     }
 
     private String mockAIResponse(String englishQuery) {
-        // Replace with actual AI model integration
-        return "Statement Overview\n" +
-                "- Statement Date: 21 Aug 2025\n" +
-                "- Due Date: 15 Sep 2025\n" +
-                "- Balance from Last Statement: £35.84\n" +
-                "- Balance on Statement Date: £89.67\n" +
-                "- Minimum Payment Due: £5.00\n" +
-                "- Payments Made: £199 total (two payments: £152 and £47)\n" +
-                "- Total Transactions: 44 (covering late July to mid-August 2025)";
+    // Deprecated: Use Gemini integration instead
+    return "";
     }
 }

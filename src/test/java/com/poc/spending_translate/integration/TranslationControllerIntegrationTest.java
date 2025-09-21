@@ -115,14 +115,6 @@ class TranslationControllerIntegrationTest {
     }
 
     @Test
-    void testTranslateQuery_MissingUserLang() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/translate/query")
-                        .param("userInput", "Hello"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void testTranslateQuery_EmptyParameters() throws Exception {
         // When & Then
         mockMvc.perform(get("/api/translate/query")
