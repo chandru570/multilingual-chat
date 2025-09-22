@@ -14,10 +14,4 @@ public class GenerateTextFromTextInput {
                         null);
         return response.text();
     }
-
-//    public static void main(String[] args) {
-//        String prompt = "Give a brief summary of my Credit Card spending habits over last three months. Generate dummy data for illustration.";
-//        String summary = generateSummary(prompt);
-//        System.out.println(summary);
-//    }
 }
